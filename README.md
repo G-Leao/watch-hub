@@ -1,4 +1,4 @@
-# Luxury Watch Hub
+# Watch Hub
 
 ## Descrição
 
