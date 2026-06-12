@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
+  padding: 22px 18px;
 }
 
 .brandMark {
@@ -14,8 +14,8 @@
 }
 
 .logo {
-  width: 56px;
-  height: 36px;
+  width: 76px;
+  height: 76px;
   border-radius: 10px;
   border: 1px solid rgba(214, 180, 90, 0.45);
   background: transparent;
@@ -31,7 +31,7 @@
   line-height: 1.05;
 }
 .brandText strong {
-  font-size: 14px;
+  font-size: 24px;
   letter-spacing: 0.8px;
   text-transform: uppercase;
 }
@@ -64,7 +64,7 @@
 .navLink:hover {
   transform: translateY(-1px);
   border-color: var(--border);
-  background: rgba(18, 18, 18, 0.55);
+  background: rgba(8, 20, 36, 0.7);
 }
 
 .sidebar {
@@ -72,6 +72,7 @@
   top: 92px;
   padding: 14px;
 }
+
 .sidebarTitle {
   font-size: 12px;
   color: var(--muted);
@@ -93,8 +94,9 @@
 }
 .sidebarItem:hover {
   border-color: var(--border);
-  background: rgba(18, 18, 18, 0.55);
+  background: rgba(8, 20, 36, 0.7);
 }
+
 
 .footerRow {
   display: flex;
@@ -271,7 +273,8 @@
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: rgba(10, 10, 10, 0.9);
+  background: rgba(8, 20, 36, 0.85);
+
   box-shadow: var(--shadow);
   min-width: 240px;
 }
@@ -365,3 +368,84 @@
     transform: translateX(100%);
   }
 }
+
+/* Burger menu (mobile) */
+.burgerButton {
+  display: none;
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.burgerIcon {
+  width: 18px;
+  height: 14px;
+  position: relative;
+  display: block;
+}
+
+.burgerIcon::before,
+.burgerIcon::after,
+.burgerIcon span {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+}
+
+.burgerIcon::before {
+  top: 0;
+}
+
+.burgerIcon::after {
+  bottom: 0;
+}
+
+.burgerIcon {
+  background: transparent;
+}
+
+/* middle line */
+.burgerIcon::marker {
+  content: "";
+}
+
+@media (max-width: 720px) {
+  .burgerButton {
+    display: inline-flex;
+  }
+
+  .navLinks {
+    display: none;
+    position: absolute;
+    top: 74px;
+    left: 12px;
+    right: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 10, 0.96);
+    z-index: 999;
+  }
+
+  .navLinksOpen {
+    display: flex;
+  }
+
+  .navLink {
+    justify-content: center;
+  }
+}
+

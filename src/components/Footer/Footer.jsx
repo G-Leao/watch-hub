@@ -5,7 +5,7 @@ export default function Footer() {
     <div className="footerRow">
       <span>© {new Date().getFullYear()} Luxury Watch Hub</span>
       <span className="muted">
-        Dark Luxury Theme • LocalStorage • Fetch API
+        LUXO E ESTILO
       </span>
     </div>
   );
