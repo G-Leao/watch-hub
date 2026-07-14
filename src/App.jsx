@@ -14,6 +14,7 @@ import Favoritos from "./pages/Favoritos/Favoritos";
 import { AppProvider } from "./services/hooks/useAppState.jsx";
 import { ToastProvider } from "./services/hooks/useToast.jsx";
 
+
 export default function App() {
   return (
     <ToastProvider>
