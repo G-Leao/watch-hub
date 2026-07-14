@@ -1,5 +1,6 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Sidebar from "./components/Sidebar/Sidebar";
@@ -50,6 +51,7 @@ export default function App() {
             <Footer />
           </footer>
         </div>
+        <SpeedInsights />
       </AppProvider>
     </ToastProvider>
   );
