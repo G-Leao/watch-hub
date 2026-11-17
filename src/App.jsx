@@ -16,9 +16,11 @@ import { ToastProvider } from "./services/hooks/useToast.jsx";
 
 function ScrollTop() {
   const { pathname } = useLocation();
+
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
   return null;
 }
 
@@ -27,14 +29,21 @@ export default function App() {
     <ToastProvider>
       <AppProvider>
         <div className="appShell">
-          <a className="skipLink" href="#conteudo">Pular para o conteúdo</a>
+          <a className="skipLink" href="#conteudo">
+            Pular para o conteúdo
+          </a>
           <ScrollTop />
-          <header className="appHeader"><Navbar /></header>
+          <header className="appHeader">
+            <Navbar />
+          </header>
           <main id="conteudo" className="appMain">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/explorar" element={<Catalogo />} />
-              <Route path="/catalogo" element={<Navigate to="/explorar" replace />} />
+              <Route
+                path="/catalogo"
+                element={<Navigate to="/explorar" replace />}
+              />
               <Route path="/marcas" element={<Marcas />} />
               <Route path="/marcas/:slug" element={<Marca />} />
               <Route path="/painel" element={<Dashboard />} />
@@ -45,7 +54,9 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
-          <footer className="appFooter"><Footer /></footer>
+          <footer className="appFooter">
+            <Footer />
+          </footer>
         </div>
       </AppProvider>
     </ToastProvider>
