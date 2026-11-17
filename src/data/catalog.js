@@ -10,7 +10,7 @@ import RoyalOak5402 from "../assets/imgs/RoyalOak5402.jpeg";
 import pateknautilus from "../assets/imgs/patek-nautilus-5711-1a-010.jpg";
 import patekaquanaut from "../assets/imgs/patek-aquanaut-5167a.jpg";
 import RafaelNadal from "../assets/imgs/RM 027 Tourbillon Rafael Nadal.jpg";
-import JUMBOEXTRATHiN from "../assets/imgs/15202St.webp";
+import JUMBOEXTRATHiN from "../assets/imgs/15202ST.webp";
 import SplitSeconds from "../assets/imgs/RM 056 Sapphire Tourbillon Split-Seconds Chronograph.jpg";
 import flybackChrono from "../assets/imgs/RM 011 Flyback Chronograph.jpg";
 import Résonance from "../assets/imgs/F.P. Journe Chronomètre à Résonance.jpg";
