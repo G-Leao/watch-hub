@@ -20,18 +20,7 @@ export default function Cadastro() {
   }, []);
 
   function handleSubmit(values) {
-    if (editing?.id) {
-      actions.updateWatch(editing.id, { ...values, updatedAt: Date.now() });
-      setEditing(null);
-      return;
-    }
-
-    actions.addWatch({
-      ...values,
-      id: String(Date.now()),
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+    actions.addWatch(values);
   }
 
   return (
@@ -51,6 +40,7 @@ export default function Cadastro() {
             dialColor: "",
             waterResistance: "",
             price: "",
+            currency: "BRL",
             imageUrl: "",
             description: "",
           }

@@ -1,169 +1,115 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import { AppContext } from "../../services/hooks/useAppState.jsx";
-import FavoriteButton from "../FavoriteButton/FavoriteButton";
+import { COMPLICATION_LABELS } from "../../data/catalog.js";
+import { NA, fmtMoney, isEmpty } from "../../services/watchModel.js";
+import FavoriteButton from "../FavoriteButton/FavoriteButton.jsx";
+import WatchImage from "../WatchImage/WatchImage.jsx";
 
-const rows = [
-  { key: "brand", label: "Marca" },
-  { key: "model", label: "Modelo" },
-  { key: "movement", label: "Movimento" },
-  { key: "material", label: "Material" },
-  { key: "diameter", label: "Tamanho" },
-  { key: "waterResistance", label: "Resistência à água" },
-  { key: "price", label: "Preço" },
+const money = (e) => (e ? fmtMoney(e.value, e.currency) : null);
+const soldLines = (w) => (w.prices?.sold || []).map((s) => `${fmtMoney(s.value, s.currency)} — ${s.venue}, ${s.date}`);
+const yesNo = (v) => (v === true ? "Sim" : v === false ? "Não" : null);
+
+const SECTIONS = [
+  {
+    title: "Identificação",
+    rows: [
+      ["Marca", (w) => w.brand],
+      ["Coleção / modelo", (w) => w.model],
+      ["Referência exata", (w) => w.reference],
+      ["Ano de lançamento", (w) => w.year],
+      ["Tipo", (w) => (w.kind === "bolso" ? "Relógio de bolso" : "Relógio de pulso")],
+    ],
+  },
+  {
+    title: "Preços (tipos nunca misturados)",
+    rows: [
+      ["Preço oficial de varejo", (w) => money(w.prices?.retail)],
+      ["Preço anunciado", (w) => (w.prices?.listed ? `${money(w.prices.listed)}${w.prices.listed.unverified ? " (não verificado)" : ""}` : null)],
+      ["Negociado em leilão", (w) => soldLines(w)],
+    ],
+  },
+  {
+    title: "Técnico",
+    rows: [
+      ["Calibre", (w) => w.caliber],
+      ["Tipo de movimento", (w) => w.movement],
+      ["Reserva de marcha", (w) => w.powerReserve],
+      ["Complicações", (w) => (w.complications || []).map((c) => COMPLICATION_LABELS[c] || c)],
+      ["Material da caixa", (w) => w.material],
+      ["Material da pulseira", (w) => w.braceletMaterial],
+      ["Diâmetro", (w) => w.diameter],
+      ["Espessura", (w) => w.thickness],
+      ["Resistência à água", (w) => w.waterResistance],
+    ],
+  },
+  {
+    title: "Raridade",
+    rows: [
+      ["Edição", (w) => (w.edition === "unica" ? "Peça única" : w.edition === "limitada" ? "Edição limitada" : null)],
+      ["Quantidade produzida (documentada)", (w) => w.produced],
+    ],
+  },
+  {
+    title: "Condição e procedência",
+    rows: [
+      ["Condição", (w) => w.condition],
+      ["Documentação", (w) => w.documentation],
+      ["Caixa original", (w) => yesNo(w.originalBox)],
+      ["Procedência", (w) => w.provenance],
+    ],
+  },
 ];
 
+function Cell({ value }) {
+  if (isEmpty(value)) return <span className="na">{NA}</span>;
+  if (Array.isArray(value)) return <ul className="cellList">{value.map((v, i) => <li key={i}>{v}</li>)}</ul>;
+  return <>{String(value)}</>;
+}
+
 export default function ComparisonTable({ watches }) {
-  const { favorites } = useContext(AppContext);
-
-  const left = watches[0];
-  const right = watches[1];
-
-  const favLeft = left ? favorites.includes(left.id) : false;
-  const favRight = right ? favorites.includes(right.id) : false;
-
-  const col = (w, idx) => (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      {w ? (
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <img
-            src={w.imageUrl}
-            alt={w.model}
-            style={{
-              width: 70,
-              height: 70,
-              borderRadius: 14,
-              objectFit: "cover",
-              border: "1px solid var(--border)",
-            }}
-          />
-          <div>
-            <strong>
-              {w.brand} • {w.model}
-            </strong>
-            <div className="muted" style={{ marginTop: 4 }}>
-              Ref: {w.reference}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="muted">Selecione um relógio</div>
-      )}
-
-      {w ? (
-        <div>
-          <span className="muted">Favorito</span>
-          <div style={{ marginTop: 6 }}>
-            <FavoriteButton id={w.id} />
-          </div>
-        </div>
-      ) : (
-        <div />
-      )}
-
-      <div className="muted">
-        {idx === 0 ? "Primeira seleção" : "Segunda seleção"}
+  const { actions } = useContext(AppContext);
+  if (watches.length === 0) {
+    return (
+      <div className="emptyState">
+        <h2>Nenhuma referência selecionada</h2>
+        <p className="muted">Escolha até 3 relógios no seletor acima ou toque em “+ Comparar” em qualquer peça.</p>
+        <Link className="btn btnPrimary" to="/explorar">Explorar o acervo</Link>
       </div>
-    </div>
-  );
+    );
+  }
+  const cols = `minmax(150px, 0.8fr) repeat(${watches.length}, minmax(180px, 1fr))`;
 
   return (
-    <div className="card">
-      <div className="grid2" style={{ gap: 18 }}>
-        {col(left, 0)}
-        {col(right, 1)}
-      </div>
-
-      <div style={{ height: 14 }} />
-
-      <div style={{ overflowX: "auto" }}>
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "separate",
-            borderSpacing: 0,
-          }}
-        >
-          <thead>
-            <tr>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: 10,
-                  borderBottom: "1px solid var(--border)",
-                  color: "var(--muted)",
-                }}
-              >
-                Item
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: 10,
-                  borderBottom: "1px solid var(--border)",
-                  color: "var(--muted)",
-                }}
-              >
-                Relógio A
-              </th>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: 10,
-                  borderBottom: "1px solid var(--border)",
-                  color: "var(--muted)",
-                }}
-              >
-                Relógio B
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.key}>
-                <td
-                  style={{
-                    padding: 10,
-                    borderBottom: "1px solid rgba(255,255,255,.06)",
-                  }}
-                >
-                  {r.label}
-                </td>
-                <td
-                  style={{
-                    padding: 10,
-                    borderBottom: "1px solid rgba(255,255,255,.06)",
-                  }}
-                >
-                  {left ? (
-                    r.key === "price" ? (
-                      `R$ ${Number(left.price).toFixed(2)}`
-                    ) : (
-                      left[r.key]
-                    )
-                  ) : (
-                    <span className="muted">—</span>
-                  )}
-                </td>
-                <td
-                  style={{
-                    padding: 10,
-                    borderBottom: "1px solid rgba(255,255,255,.06)",
-                  }}
-                >
-                  {right ? (
-                    r.key === "price" ? (
-                      `R$ ${Number(right.price).toFixed(2)}`
-                    ) : (
-                      right[r.key]
-                    )
-                  ) : (
-                    <span className="muted">—</span>
-                  )}
-                </td>
-              </tr>
+    <div className="cmpScroll">
+      <div className="cmp" style={{ "--cols": cols }} role="table" aria-label="Comparação de relógios">
+        <div className="cmpRow cmpHead" role="row">
+          <div className="cmpLabel" role="columnheader" />
+          {watches.map((w) => (
+            <div key={w.id} className="cmpWatch" role="columnheader">
+              <div className="cmpThumb"><WatchImage watch={w} /></div>
+              <span className="watchBrand">{w.brand}</span>
+              <strong className="cmpName">{w.model}</strong>
+              <div className="cmpActions">
+                <FavoriteButton id={w.id} />
+                <button type="button" className="btn" onClick={() => actions.selectForComparison(w.id)}>Remover</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        {SECTIONS.map((s) => (
+          <React.Fragment key={s.title}>
+            <div className="cmpSection" role="row">{s.title}</div>
+            {s.rows.map(([label, get]) => (
+              <div key={label} className="cmpRow" role="row">
+                <div className="cmpLabel" role="rowheader">{label}</div>
+                {watches.map((w) => (
+                  <div key={w.id} className="cmpCell" role="cell"><Cell value={get(w)} /></div>
+                ))}
+              </div>
             ))}
-          </tbody>
-        </table>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );

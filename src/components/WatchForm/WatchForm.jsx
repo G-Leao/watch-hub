@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { BRANDS } from "../../data/brands.js";
 
 const requiredFields = [
   "brand",
@@ -10,8 +11,6 @@ const requiredFields = [
   "movement",
   "dialColor",
   "waterResistance",
-  "price",
-  "imageUrl",
   "description",
 ];
 
@@ -59,7 +58,7 @@ export default function ({
         e[k] = "Campo obrigatório.";
     }
 
-    if (form.price !== "" && Number(form.price) <= 0)
+    if (form.price !== "" && form.price !== undefined && Number(form.price) <= 0)
       e.price = "O preço deve ser maior que zero.";
     if (form.year !== "" && !isValidYear(form.year))
       e.year = "Ano inválido. Use um ano entre 1900 e o ano atual.";
@@ -92,7 +91,7 @@ export default function ({
 
     onSubmit({
       ...form,
-      price: Number(form.price),
+      price: form.price === "" ? null : Number(form.price),
       year: Number(form.year),
     });
   }
@@ -108,9 +107,9 @@ export default function ({
             onChange={(e) => handleChange("brand", e.target.value)}
           >
             <option value="">Selecione</option>
-            <option value="Seiko">Seiko</option>
-            <option value="Victorinox">Victorinox</option>
-            <option value="Rolex">Rolex</option>
+            {BRANDS.map((b) => (
+              <option key={b.slug} value={b.name}>{b.name}</option>
+            ))}
           </select>
           {errors.brand && <div className="errorText">{errors.brand}</div>}
         </label>
@@ -216,11 +215,16 @@ export default function ({
         </label>
 
         <label className="label">
-          <span>Preço (R$)</span>
+          <span>Preço anunciado (opcional)</span>
+          <select className="input" aria-label="Moeda" value={form.currency || "BRL"} onChange={(e) => handleChange("currency", e.target.value)} style={{ marginBottom: 8 }}>
+            <option value="BRL">BRL (R$)</option>
+            <option value="USD">USD (US$)</option>
+            <option value="CHF">CHF</option>
+          </select>
           <input
             className="input"
             type="number"
-            value={form.price}
+            value={form.price ?? ""}
             onChange={(e) => handleChange("price", e.target.value)}
             placeholder="Ex: 12500"
           />
@@ -228,7 +232,7 @@ export default function ({
         </label>
 
         <label className="label" style={{ gridColumn: "1 / -1" }}>
-          <span>Imagem URL</span>
+          <span>Imagem URL (opcional — use apenas imagens que você tem direito de usar)</span>
           <input
             className="input"
             value={form.imageUrl}

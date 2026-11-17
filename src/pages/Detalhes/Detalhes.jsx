@@ -1,153 +1,112 @@
 import React, { useContext, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../../services/hooks/useAppState.jsx";
-import FavoriteButton from "../../components/FavoriteButton/FavoriteButton";
+import FavoriteButton from "../../components/FavoriteButton/FavoriteButton.jsx";
+import WatchCard from "../../components/WatchCard/WatchCard.jsx";
+import WatchImage from "../../components/WatchImage/WatchImage.jsx";
+import PriceBlock from "../../components/PriceBlock/PriceBlock.jsx";
+import { COMPLICATION_LABELS } from "../../data/catalog.js";
+import { NA, isEmpty } from "../../services/watchModel.js";
 
 export default function Detalhes() {
   const { id } = useParams();
-  const { watches, actions } = useContext(AppContext);
-  const watch = useMemo(
-    () => watches.find((w) => String(w.id) === String(id)),
-    [watches, id],
-  );
-
+  const navigate = useNavigate();
+  const { watches, comparison, maxCompare, actions } = useContext(AppContext);
+  const watch = useMemo(() => watches.find((w) => String(w.id) === String(id)), [watches, id]);
+  const related = useMemo(() => watches.filter((w) => watch && w.brandSlug === watch.brandSlug && w.id !== watch.id).slice(0, 4), [watches, watch]);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!watch) {
     return (
       <section className="page">
-        <h1 className="pageTitle">Detalhes</h1>
-        <div className="card">
-          <p className="muted">Relógio não encontrado.</p>
+        <div className="emptyState">
+          <h1>Relógio não encontrado</h1>
+          <p className="muted">Ele pode ter sido excluído ou o link está incorreto.</p>
+          <Link className="btn btnPrimary" to="/explorar">Voltar ao acervo</Link>
         </div>
       </section>
     );
   }
 
+  const inCmp = comparison.includes(watch.id);
+  const specs = [
+    ["Referência", watch.reference],
+    ["Ano de lançamento", watch.year],
+    ["Tipo", watch.kind === "bolso" ? "Relógio de bolso" : "Relógio de pulso"],
+    ["Material da caixa", watch.material],
+    ["Material da pulseira", watch.braceletMaterial],
+    ["Calibre", watch.caliber],
+    ["Movimento", watch.movement],
+    ["Reserva de marcha", watch.powerReserve],
+    ["Complicações", (watch.complications || []).map((c) => COMPLICATION_LABELS[c] || c).join(", ")],
+    ["Diâmetro", watch.diameter],
+    ["Espessura", watch.thickness],
+    ["Cor do mostrador", watch.dialColor],
+    ["Resistência à água", watch.waterResistance],
+    ["Edição", watch.edition === "unica" ? "Peça única" : watch.edition === "limitada" ? "Edição limitada" : null],
+    ["Quantidade produzida", watch.produced],
+    ["Condição", watch.condition],
+    ["Documentação", watch.documentation],
+    ["Caixa original", watch.originalBox === true ? "Sim" : watch.originalBox === false ? "Não" : null],
+    ["Procedência", watch.provenance],
+  ];
+
   return (
     <section className="page">
-      <h1 className="pageTitle">Detalhes do Relógio</h1>
+      <nav className="crumbs" aria-label="Você está em">
+        <Link to="/explorar">Acervo</Link>
+        <span aria-hidden="true">/</span>
+        {watch.brandSlug ? <Link to={`/marcas/${watch.brandSlug}`}>{watch.brand}</Link> : <span>{watch.brand}</span>}
+      </nav>
 
-      <div className="grid2">
-        <div className="card">
-          <img
-            src={watch.imageUrl}
-            alt={watch.model}
-            style={{
-              width: "100%",
-              borderRadius: 14,
-              border: "1px solid var(--border)",
-            }}
-          />
-        </div>
+      <div className="detail">
+        <div className="detailImage"><WatchImage watch={watch} className="detailImg" /></div>
+        <div className="detailInfo">
+          <span className="watchBrand">{watch.brand}</span>
+          <h1 className="detailTitle">{watch.model}</h1>
+          <p className="detailDesc">{watch.description || "Descrição indisponível."}</p>
 
-        <div
-          className="card"
-          style={{ display: "flex", flexDirection: "column", gap: 12 }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 12,
-              alignItems: "flex-start",
-            }}
-          >
-            <div>
-              <div className="muted">{watch.brand}</div>
-              <strong style={{ fontSize: 22 }}>{watch.model}</strong>
-              <div className="muted" style={{ marginTop: 6 }}>
-                Ref: {watch.reference} • {watch.year}
-              </div>
-            </div>
+          <PriceBlock watch={watch} />
+
+          <div className="detailActions">
             <FavoriteButton id={watch.id} />
+            <button className="btn" type="button" onClick={() => actions.selectForComparison(watch.id)}>{inCmp ? "Remover do comparador" : "Adicionar ao comparador"}</button>
+            {comparison.length >= 2 && inCmp && <Link className="btn btnPrimary" to="/comparador">Ver comparação ({comparison.length}/{maxCompare})</Link>}
           </div>
 
-          <div className="grid2" style={{ gap: 10 }}>
-            <div>
-              <span className="muted">Material</span>
-              <div>{watch.material}</div>
-            </div>
-            <div>
-              <span className="muted">Movimento</span>
-              <div>{watch.movement}</div>
-            </div>
-            <div>
-              <span className="muted">Diâmetro</span>
-              <div>{watch.diameter}</div>
-            </div>
-            <div>
-              <span className="muted">Resistência à água</span>
-              <div>{watch.waterResistance}</div>
-            </div>
+          <dl className="specs">
+            {specs.map(([k, v]) => (
+              <div key={k}><dt>{k}</dt><dd>{isEmpty(v) ? <span className="na">{NA}</span> : String(v)}</dd></div>
+            ))}
+          </dl>
+
+          <div className="sourceNote">
+            <strong>Fontes desta ficha</strong>
+            <ul>{(watch.sources?.length ? watch.sources : [NA]).map((s, i) => <li key={i}>{s}</li>)}</ul>
+            {watch.imageUrl && watch.source !== "usuario" && <small>Imagem de fonte externa; direitos de uso ainda não confirmados.</small>}
           </div>
 
-          <div>
-            <span className="muted">Preço</span>
-            <div style={{ fontSize: 26, letterSpacing: ".2px" }}>
-              R$ {Number(watch.price).toFixed(2)}
-            </div>
-          </div>
-
-          <div>
-            <span className="muted">Descrição</span>
-            <p style={{ marginTop: 8, lineHeight: 1.5 }}>{watch.description}</p>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              justifyContent: "flex-end",
-              flexWrap: "wrap",
-            }}
-          >
-            <button
-              className="btn"
-              type="button"
-              onClick={() => actions.selectForComparison(watch.id)}
-            >
-              Adicionar ao comparador
-            </button>
-            <button
-              className="btn btnDanger"
-              type="button"
-              onClick={() => setConfirmDelete(true)}
-            >
-              Excluir
-            </button>
-          </div>
-
-          {confirmDelete && (
-            <div style={{ marginTop: 10 }}>
-              <p className="errorText" style={{ marginTop: 0 }}>
-                Confirmar exclusão?
-              </p>
-              <div
-                style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}
-              >
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={() => setConfirmDelete(false)}
-                >
-                  Cancelar
-                </button>
-                <button
-                  className="btn btnDanger"
-                  type="button"
-                  onClick={() => {
-                    actions.deleteWatch(watch.id);
-                    setConfirmDelete(false);
-                  }}
-                >
-                  Confirmar
-                </button>
+          {watch.source === "usuario" &&
+            (!confirmDelete ? (
+              <button className="textLink dangerLink" type="button" onClick={() => setConfirmDelete(true)}>Excluir este relógio</button>
+            ) : (
+              <div className="confirmBox" role="alertdialog" aria-label="Confirmar exclusão">
+                <p className="errorText">Excluir {watch.model}? Essa ação não pode ser desfeita.</p>
+                <div className="detailActions">
+                  <button className="btn" type="button" onClick={() => setConfirmDelete(false)}>Cancelar</button>
+                  <button className="btn btnDanger" type="button" onClick={() => { actions.deleteWatch(watch.id); navigate("/explorar"); }}>Excluir</button>
+                </div>
               </div>
-            </div>
-          )}
+            ))}
         </div>
       </div>
+
+      {related.length > 0 && (
+        <section className="section" aria-labelledby="rel">
+          <h2 id="rel" className="sectionTitle">Mais de {watch.brand}</h2>
+          <div className="watchGrid">{related.map((w) => <WatchCard key={w.id} watch={w} />)}</div>
+        </section>
+      )}
     </section>
   );
 }

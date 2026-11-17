@@ -1,61 +1,42 @@
-import React, { useId, useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useContext, useEffect, useId, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { AppContext } from "../../services/hooks/useAppState.jsx";
+import logo from "../../assets/logoWATCH.png";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const regionId = useId();
+  const { favorites, comparison } = useContext(AppContext);
+  const { pathname } = useLocation();
 
-  function closeMenu() {
+  useEffect(() => {
     setIsOpen(false);
-  }
+  }, [pathname]);
 
   return (
     <nav className="navbar" aria-label="Navegação principal">
-
       <NavLink to="/" className="brandMark">
-        <span className="logo" aria-hidden="true" />
-        <span className="brandText">
-          <strong>WATCH HUB</strong>
-          <span>Seiko • Victorinox • Rolex</span>
-        </span>
+        <img className="logo" src={logo} alt="" width="44" height="44" />
+        <span className="brandText">Watch Hub</span>
       </NavLink>
 
-      <button
-        type="button"
-        className="burgerButton"
-        aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
-        aria-expanded={isOpen}
-        aria-controls={regionId}
-        onClick={() => setIsOpen((v) => !v)}
-      >
-        <span className="burgerIcon" aria-hidden="true" />
+      <button type="button" className="burgerButton" aria-expanded={isOpen} aria-controls={regionId} onClick={() => setIsOpen((v) => !v)}>
+        {isOpen ? "Fechar" : "Menu"}
       </button>
 
-      <div
-        className={isOpen ? "navLinks navLinksOpen" : "navLinks"}
-        id={regionId}
-        aria-label="Links"
-        role="region"
-      >
-        <NavLink className="navLink" to="/" onClick={closeMenu}>
-          Dashboard
+      <div className={isOpen ? "navLinks navLinksOpen" : "navLinks"} id={regionId}>
+        <NavLink className="navLink" to="/" end>Início</NavLink>
+        <NavLink className="navLink" to="/explorar">Acervo</NavLink>
+        <NavLink className="navLink" to="/marcas">Manufaturas</NavLink>
+        <NavLink className="navLink" to="/favoritos">
+          Favoritos{favorites.length > 0 && <span className="navCount">{favorites.length}</span>}
         </NavLink>
-
-        <NavLink className="navLink" to="/catalogo" onClick={closeMenu}>
-          Catálogo
+        <NavLink className="navLink" to="/comparador">
+          Comparar{comparison.length > 0 && <span className="navCount">{comparison.length}</span>}
         </NavLink>
-        <NavLink className="navLink" to="/cadastro" onClick={closeMenu}>
-          Cadastro
-        </NavLink>
-        <NavLink className="navLink" to="/comparador" onClick={closeMenu}>
-          Comparador
-        </NavLink>
-        <NavLink className="navLink" to="/favoritos" onClick={closeMenu}>
-          Favoritos
-        </NavLink>
-
+        <NavLink className="navLink" to="/painel">Painel</NavLink>
+        <NavLink className="navCta" to="/cadastro">Cadastrar relógio</NavLink>
       </div>
     </nav>
   );
 }
-

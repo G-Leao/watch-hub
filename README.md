@@ -1,197 +1,43 @@
-# ⌚ Watch Hub
+# ⌚ Watch Hub — alta relojoaria e colecionismo
 
-## Descrição
+Catálogo de relógios de luxo, peças raras e referências de colecionador, com comparador, filtros por complicação e lista de desejos. Mantém a identidade original do projeto: React + Vite + React Router, preto e dourado, Cormorant Garamond + Inter, LocalStorage.
 
-O Watch Hub é uma aplicação web desenvolvida em React para gerenciamento de relógios de luxo das marcas Seiko, Victorinox e Rolex.
-
-A plataforma permite cadastrar, visualizar, pesquisar, comparar e favoritar relógios, além de apresentar estatísticas em um dashboard interativo. Os dados são persistidos localmente utilizando LocalStorage e a aplicação realiza integração com uma API externa para geração inicial dos dados.
-
----
-
-## Objetivo do Projeto
-
-Desenvolver uma aplicação SPA (Single Page Application) utilizando React, aplicando conceitos de componentização, gerenciamento de estado, roteamento, consumo de API, armazenamento local e boas práticas de desenvolvimento front-end.
-
----
-
-## Tecnologias Utilizadas
-
-* React
-* React Router DOM
-* JavaScript (ES6+)
-* HTML5 Semântico
-* CSS3
-* Flexbox
-* CSS Grid Layout
-* LocalStorage
-* Fetch API
-* Git
-* GitHub
-* Vite
-
----
+## Princípios de dados
+- **Nada é inventado.** Campo desconhecido é `null` e aparece como “Indisponível”.
+- **Três preços, nunca misturados:** oficial de varejo, anunciado (mercado secundário) e negociado (leilão, com casa, cidade e data).
+- **Sem média de preços** entre moedas/tipos diferentes; o filtro de faixa de preço não converte câmbio.
+- **Curadoria inicial:** confirme cada ficha na fonte oficial antes de uso comercial. Fichas incompletas (De Bethune DB28, Urwerk UR-100/UR-220, Jacob & Co. Astronomia, F.P. Journe Résonance) estão marcadas como pendentes.
 
 ## Funcionalidades
+| Recurso | Situação |
+|---|---|
+| Home com peça em destaque, resultados de leilão, únicas/limitadas, históricos, manufaturas, complicações | dados do catálogo local |
+| Acervo: busca (marca, modelo, referência, complicação, material, ano), filtros de marca, segmento, complicações, única/limitada, vintage, material, faixa de preço por moeda, ordenação, paginação, filtros na URL | funcional |
+| Manufaturas (`/marcas`, `/marcas/:slug`) com 40 marcas | funcional; marcas sem fichas mostram estado vazio |
+| Detalhes com preços separados, especificações, fontes | funcional |
+| Comparador de até 3 referências, seletor direto, “Indisponível” onde não há dado | funcional |
+| Favoritos / lista de desejos, Painel, Cadastro manual | funcional (LocalStorage) |
 
-### Dashboard
+## Como adicionar dados
+- **Nova marca:** uma linha em `src/data/brands.js`.
+- **Nova referência:** um bloco `lux("Marca", { ... })` em `src/data/catalog.js`. Preencha só o que for documentado.
+- **Resultado de leilão:** `prices.sold: [{ value, currency, venue, date, note }]`.
+- **Imagem:** `imageUrl` (e `imageCredit`). Sem imagem, o app mostra um mostrador ilustrativo, nunca a foto de outro relógio.
 
-* Exibição de estatísticas gerais
-* Quantidade total de relógios cadastrados
-* Quantidade por marca
-* Valor médio da coleção
-* Últimos relógios adicionados
+## O que mudou em relação à versão anterior
+- O seed por `dummyjson.com` foi removido: ele só servia para contar 15 itens. O catálogo agora é local e versionado.
+- Removido o bloco `watchSpecs` duplicado e conflitante do seed (valia a versão interna).
+- Anos fabricados por fórmula (`2010 + i % 14`) foram descartados; só os 5 Rolex têm ano verificável.
+- Os 15 relógios originais continuam, com os mesmos ids (favoritos antigos seguem válidos). Seiko e Victorinox ficam no segmento “Entrada”.
+- **Os valores em BRL dos 15 itens originais não são verificados** e aparecem rotulados assim. As imagens deles são links externos, sem direito de uso confirmado.
+- LocalStorage v1 → v2: só os relógios cadastrados pelo usuário são migrados; favoritos e comparação são preservados.
+- Comparador de 2 para 3 referências; tabela por seções em vez de estilos inline.
+- Hooks duplicados (`.js`/`.jsx`) e componentes órfãos removidos.
 
-### Catálogo
-
-* Listagem completa dos relógios
-* Busca por modelo
-* Busca por referência
-* Filtro por marca
-* Ordenação por preço
-* Ordenação por ano
-* Paginação dos resultados
-
-### Cadastro de Relógios
-
-Validações implementadas:
-
-* Todos os campos obrigatórios
-* Ano válido (1900 até o ano atual)
-* Preço maior que zero
-* Referência única
-* URL da imagem válida
-
-### Detalhes
-
-* Visualização completa das informações do relógio
-* Imagem ampliada
-* Especificações técnicas
-* Descrição detalhada
-
-### Favoritos
-
-* Adicionar relógios aos favoritos
-* Remover favoritos
-* Persistência no LocalStorage
-
-### Comparador
-
-* Comparação entre dois relógios
-* Exibição lado a lado das especificações
-
-### Persistência de Dados
-
-Utilização do LocalStorage para armazenar:
-
-* Relógios cadastrados
-* Favoritos
-* Comparações
-
----
-
-## Integração com API Externa
-
-A aplicação utiliza a API:
-
-https://dummyjson.com/products
-
-Os dados retornados são convertidos em relógios fictícios para gerar uma coleção inicial automaticamente quando o sistema é executado pela primeira vez.
-
----
-
----
-
-## Como Instalar
-
-Clone o repositório:
-
-```bash
-git clone URL_DO_REPOSITORIO
-```
-
-Acesse a pasta:
-
-```bash
-cd watch-hub
-```
-
-Instale as dependências:
-
+## Rodando
 ```bash
 npm install
+npm run dev      # desenvolvimento
+npm run build    # produção
+npm run check    # testes de dados, filtros, migração e render de todas as rotas
 ```
-
----
-
-## Como Executar
-
-```bash
-npm run dev
-```
-
-Após iniciar o projeto, acesse:
-
-```text
-http://localhost:5173
-```
-
----
-
-## Responsividade
-
-A aplicação foi desenvolvida utilizando:
-
-* Flexbox
-* CSS Grid
-* Media Queries
-
-Garantindo compatibilidade com:
-
-* Desktop
-* Tablets
-* Smartphones
-
----
-
-## Boas Práticas Aplicadas
-
-* Componentização React
-* Separação de responsabilidades
-* Reutilização de componentes
-* Gerenciamento de estado com Hooks
-* Persistência de dados
-* Navegação utilizando React Router
-* Controle de versão com Git
-* Hospedagem do código no GitHub
-
----
-
-## Capturas de Tela
-
-Inserir imagens das telas:
-
-* Dashboard
-* Catálogo
-* Cadastro
-* Detalhes
-* Comparador
-* Favoritos
-
----
-
-## Melhorias Futuras
-
-* Integração com banco de dados
-* Sistema de autenticação
-* Upload de imagens
-* Dashboard com gráficos avançados
-* Consumo de API especializada em relógios
-* Tema claro/escuro
-
----
-
-## Autor
-
-Gustavo Leão
-
-Projeto desenvolvido para a disciplina de Desenvolvimento Front-End – Unicesumar.
