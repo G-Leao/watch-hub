@@ -21,7 +21,7 @@ import LegacyMachine from "../assets/imgs/Legacy Machine No.1 (LM1).jpg";
 import DeBethune from "../assets/imgs/De Bethune.jpg";
 import UrwerkUR from "../assets/imgs/Urwerk.jpg";
 import UrwerkurSatel from "../assets/imgs/urwerk-ur-220.jpg";
-import Astronomia from "../assets/imgs/jacob & Co.ASTRONOMIA.jpg";
+import Astronomia from "../assets/imgs/Jacob & Co.ASTRONOMIA.jpg";
 import Zeitwerk from "../assets/imgs/A. Lange & Söhne Zeitwerk.jpg";
 // REGRAS DO CATÁLOGO
 // - Campo desconhecido = null (a interface mostra "Indisponível"). Nunca preencher por estimativa.
